@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useClassRoomStore } from "../../store/useClassRoom";
-import { ChatModal } from "../../models/ChartModal";
+
 import { ClassroomCard } from "../../cards/ClassroomCard";
 import ClassroomDetail from "./ClassroomDetail";
 
@@ -40,6 +40,8 @@ const StudentClassrooms = () => {
   const [showChat, setShowChat] = useState(false);
   const [selectedInstructor, setSelectedInstructor] = useState<Instructor | null>(null);
 
+
+  console.log(showChat, selectedInstructor)
   const [selectedClassroomId, setSelectedClassroomId] = useState<Classroom | null>(null);
 
   useEffect(() => {
