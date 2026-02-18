@@ -9,7 +9,7 @@ const Form3T = () => {
     currentStep,
     setCurrentStep,
     totalTeacherSteps,
-    setFormData
+  
   } = useMultiformStore();
 
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>(formData.teachingSubjects || []);

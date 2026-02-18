@@ -1,11 +1,11 @@
 
 import {motion} from "framer-motion"
-import { BookOpen, MessageSquare , Eye, Users , FileText , Calendar , TrendingUp} from 'lucide-react'
+import { BookOpen , Eye, Users , FileText , Calendar , TrendingUp} from 'lucide-react'
 import ComingSoon from '../components/skeletons/ComingSoon'
 import { StatCard } from './StudentStartCard'
 
 import type { ClassroomResponseDto } from '../store/useClassRoom'
-const MyClassroomCard = ({ classroom , onChat }: { classroom: ClassroomResponseDto , onChat: (inst: any) => void}) => {
+const MyClassroomCard = ({ classroom }: { classroom: ClassroomResponseDto , onChat: (inst: any) => void}) => {
     return (
         <motion.div
       initial={{ opacity: 0, y: 30 }}

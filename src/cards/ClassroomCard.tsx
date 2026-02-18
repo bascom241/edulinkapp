@@ -4,7 +4,7 @@ import {
   FileText,
   Calendar,
   ArrowRight,
-  MessageSquare,
+
   Star,
   TrendingUp,
   BookOpen,
@@ -18,7 +18,7 @@ import { motion } from "framer-motion"
 import JoinClassModal from "../models/JoinClassModal";
 
 import ComingSoon from "../components/skeletons/ComingSoon";
-export const ClassroomCard = ({ classroom, onChat, onViewDetail }: { classroom: any; onChat: (c: any) => void; onViewDetail: () => void; }) => {
+export const ClassroomCard = ({ classroom,  onViewDetail }: { classroom: any; onChat: (c: any) => void; onViewDetail: () => void; }) => {
 
 
 

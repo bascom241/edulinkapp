@@ -28,7 +28,7 @@ type Bank = {
 
 const Profile = () => {
   const { fetchUserWallet, userWallet } = useWalletStore();
-  const { user, editProfile, editBankDetails, editingBankDetail } = useAuthStore();
+  const { user, editProfile, editBankDetails} = useAuthStore();
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [formData, setFormData] = useState({
@@ -189,21 +189,7 @@ const Profile = () => {
     }
     setIsEditing(false);
   }
-  const handleCancel = () => {
-    setFormData({
-      firstName: user?.firstName || '',
-      lastName: user?.lastName || '',
-      phoneNumber: user?.phoneNumber || '',
-      teachingSubjects: user?.teachingSubjects || [],
-      teachingLevel: user?.teachingLevel || '',
-      shortBio: user?.shortBio || '',
-      yearsOfExperience: user?.yearsOfExperience || 0,
-      socialLink: user?.socialLink || '',
-      bankAccount: user?.bankAccount || '',
-      bankName: user?.bankName || ''
-    });
-    setIsEditing(false);
-  };
+
 
   // Custom Tooltip Component
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -718,7 +704,8 @@ const Profile = () => {
                         dataKey="value"
                         label={({ name, percent }: any) => `${name}: ${(percent * 100).toFixed(0)}%`}
                       >
-                        {subjectDistributionData.map((entry, index) => (
+                        {subjectDistributionData.map((_, index) => (
+                         
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                       </Pie>
