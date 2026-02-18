@@ -1,0 +1,245 @@
+import { create } from "zustand";
+import axiosInstance from "../lib/axios";
+import toast from "react-hot-toast";
+
+interface Classroom {
+  // Define classroom structure properly if you know it
+  [key: string]: any;
+}
+
+
+export interface EditBankDetail {
+  bankName: string 
+  bankAccount: string 
+  slug: string   
+}
+
+export interface EditUser {
+
+}
+export interface User {
+  userId: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  password: string;
+  confirmPassword: string;
+  role: string;
+  shortBio: string;
+  socialLink: string;
+  student: boolean;
+  teacher: boolean;
+  teachingLevel: string;
+  teachingSubjects: string[];
+  yearsOfExperience: number;
+
+  bankAccount: string;
+  bankCode: string;
+  bankName: string;
+
+  certificateImageName: string;
+  certificateImageType: string | null;
+  certificateUrl: File | null;
+
+  governmentIdImageName: string;
+  governmentIdImageType: string | null;
+  governmentIdUrl: File | null;
+
+  classrooms: Classroom[];
+  orders: any[];
+
+  sctaPoints: number;
+  noOfSessions: number;
+  token: string | null;
+  tokenExpiry: string | null;
+}
+
+const authKey = "authToken";
+
+export interface AuthState {
+  isAuthenticated: boolean;
+  user: User | null;
+  token: string | null;
+  loggingIn: boolean;
+  error: string | null;
+  isRegistering: boolean;
+  forgetingPassword: boolean;
+  resetingPassword: boolean;
+  login: (formData: { email: string; password: string }) => Promise<boolean>;
+  registerUser: (FormData: any) => Promise<void>;
+  forgotPassword: (email: string) => Promise<boolean>;
+  resetPassword: (
+    token: string,
+    password: string,
+    confirmPassword: string,
+  ) => Promise<boolean>;
+  getUser: () => Promise<void>;
+  loadingUser?: boolean;
+  logout?: () => Promise<{ success: boolean; data: string }>;
+  editProfile?: (data: any ) => Promise<User> 
+  editBankDetails?: (data : EditBankDetail) => Promise <void>
+  editingBankDetail: boolean
+}
+export const useAuthStore = create<AuthState>((set, get) => ({
+  loadingUser: false,
+  isAuthenticated: false,
+  user: null,
+  token: null,
+  loggingIn: false,
+  error: null,
+  isRegistering: false,
+  forgetingPassword: false,
+  resetingPassword: false,
+  editingBankDetail: false,
+
+  login: async (formData: { email: string; password: string }) => {
+    console.log("Logging in with data:", formData);
+    set({ loggingIn: true, error: null });
+    try {
+      const response = await axiosInstance.post("/auth/login", formData);
+      console.log(response);
+      const token = response.data;
+      localStorage.setItem(authKey, token);
+      set({ isAuthenticated: true, token, loggingIn: false });
+      toast.success(response.data.message || "Login successful!");
+      return true;
+    } catch (error) {
+      console.error("Login error:", error);
+      if (error instanceof Error) {
+        set({ loggingIn: false, error: error.message });
+      }
+      return false;
+    } finally {
+      set({ loggingIn: false });
+    }
+  },
+  logout: async () => {
+    try {
+      const response = await axiosInstance.post("/auth/logout");
+      localStorage.removeItem(authKey);
+      set({ isAuthenticated: false, user: null, token: null });
+      return { success: true, data: response.data };
+    } catch (error: any) {
+      return {
+        success: false,
+        data: error.response?.data || "Logout failed",
+      };
+    }
+  },
+  registerUser: async (formData: FormData) => {
+    console.log("Registering user with data:", formData);
+    set({ isRegistering: true });
+    try {
+      const response = await axiosInstance.post<{
+        message: string;
+        data: User;
+      }>("/auth/register", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      toast.success(response.data.message || "Registration successful!");
+      window.location.href = "/login";
+    } catch (error: any) {
+      const message =
+        error?.response?.data ||
+        error.message ||
+        "Registration failed. Please try again.";
+      toast.error(message);
+      console.log("Error:", message);
+    } finally {
+      set({ isRegistering: false });
+    }
+  },
+
+  forgotPassword: async (email) => {
+    set({ forgetingPassword: true });
+    try {
+      await axiosInstance.post(
+        "/auth/forgot-password",
+        { email },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      set({ forgetingPassword: false });
+      return true;
+    } catch (error) {
+      set({ forgetingPassword: false });
+      return false;
+    }
+  },
+
+  resetPassword: async (token, password, confirmPassword) => {
+    set({ resetingPassword: true });
+    try {
+      await axiosInstance.post(`auth/reset-password?token=${token}`, {
+        password,
+        confirmPassword,
+      });
+      set({ resetingPassword: false });
+      return true;
+    } catch (error) {
+      set({ resetingPassword: false });
+      console.log(error);
+      return false;
+    }
+  },
+  getUser: async () => {
+    set({ loadingUser: true });
+
+    try {
+      const response = await axiosInstance.post("/auth/user");
+      set({ user: response.data, isAuthenticated: true, loadingUser: false });
+      toast.success("User data fetched successfully");
+      console.log("User data:", response.data);
+      const user = get().user;
+      console.log("User:", user);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      set({ loadingUser: false });
+      toast.error("Failed to fetch user data");
+    }
+  },
+  editProfile: async (data) => {
+    try {
+      const response = await axiosInstance.post("/auth/edit", data);
+      
+      console.log(response);
+      return response?.data
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
+  editBankDetails : async (data:EditBankDetail) => {
+    console.log("data to send ", data )
+    console.log(get().user)
+    set({editingBankDetail: true })
+    try {
+      const response = await axiosInstance.post("/auth/edit-user-bank", data);
+      console.log(response)
+      set((state)=> ({
+        user: state.user ? {
+          ...state.user, 
+          bankAccount: response?.data.bankAccount,
+          bankName: response?.data.bankName
+        } : undefined
+      }))
+
+         set({editingBankDetail: false  })
+      
+    } catch (error:any) {
+       set({editingBankDetail: false  })
+      toast.error("Failed to edit ")
+
+        console.log(error)
+            if (error.response) {
+                console.log("Error Response:", error.response.data)
+                console.log("Error Status:", error.response.status)
+      }
+    }
+  }
+}));
