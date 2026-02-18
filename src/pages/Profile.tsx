@@ -57,7 +57,7 @@ const Profile = () => {
   }, [user, fetchUserWallet]);
 
   useEffect(() => {
-    fetch('http://localhost:8080/api/banks')
+    fetch('https://ed-link.up.railway.app/api/banks')
       .then(res => res.json())
       .then(data => setBanks(data))
       .catch(err => console.error(err));
